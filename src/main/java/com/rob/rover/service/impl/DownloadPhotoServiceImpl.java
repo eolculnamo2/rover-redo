@@ -21,6 +21,7 @@ public class DownloadPhotoServiceImpl implements DownloadPhotoService {
 	private final String SAVE_PATH = "src/main/resources/static/saved-photos/";
 	private static final Logger logger = LoggerFactory.getLogger(DownloadPhotoServiceImpl.class);
 
+	@Override
 	public void downloadPhotos(List<String> photoUrls, String folderName) {
 		File dir = new File(SAVE_PATH + folderName);
 		if (dir.exists()) {
