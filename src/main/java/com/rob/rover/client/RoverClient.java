@@ -21,12 +21,20 @@ public class RoverClient {
 		objectReader = new ObjectMapper().readerFor(PhotoResponseDto.class);
 	}
 
-	public List<String> getPhotosByDate(String sol, RoverEnum rover, String camera) {
-		WebClient client = WebClient.create(ClientConstants.API_URL);
+	public List<String> getPhotosByDate(String date, RoverEnum rover, String camera) {
+		WebClient client = WebClient.builder()
+			.baseUrl(ClientConstants.API_URL)
+			.exchangeStrategies(builder ->
+				builder.codecs(codecs ->
+					codecs.defaultCodecs().maxInMemorySize(2 * 1024 * 1024)
+				)
+			)
+			.build();
+
 		String response = client.get()
 			.uri(uriBuilder -> uriBuilder
 			.path("/{rover}/photos")
-			.queryParam("sol", sol)
+			.queryParam("earth_date", date)
 			.queryParam("camera", camera != "all" ? camera : null)
 			.queryParam("api_key", ClientConstants.API_KEY)
 			.build(rover))
@@ -36,7 +44,10 @@ public class RoverClient {
 
 		try {
 			PhotoResponseDto photos = objectReader.readValue(response);
-			return photos.getPhotos().stream().map(x -> x.getImgSrc()).collect(Collectors.toList());
+			return photos.getPhotos()
+				.stream()
+				.map(PhotoDto::getImgSrc)
+				.collect(Collectors.toList());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

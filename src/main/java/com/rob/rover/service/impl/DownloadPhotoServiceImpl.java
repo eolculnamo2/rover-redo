@@ -1,6 +1,8 @@
 package com.rob.rover.service.impl;
 
 import com.rob.rover.service.DownloadPhotoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -17,20 +19,40 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class DownloadPhotoServiceImpl implements DownloadPhotoService {
 	private final String SAVE_PATH = "src/main/resources/static/saved-photos/";
+	private static final Logger logger = LoggerFactory.getLogger(DownloadPhotoServiceImpl.class);
 
-	public void downloadPhotos(List<String> photoUrls) {
+	public void downloadPhotos(List<String> photoUrls, String folderName) {
+		File dir = new File(SAVE_PATH + folderName);
+		if (dir.exists()) {
+			logger.info("Directory already exists");
+			return;
+		}
+
+		dir.mkdir();
+
 		List<CompletableFuture<Void>> futures = new ArrayList<>();
 		for(String url : photoUrls) {
+
 		  CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(() -> {
 			try {
 				BufferedImage img = ImageIO.read(new URL(url));
+
 				String urlForFile = new StringBuilder(SAVE_PATH)
+					.append(folderName)
+					.append("/")
 					.append(UUID.randomUUID().toString())
 					.append(".png")
 					.toString();
+
 				File imgFile = new File(urlForFile);
-				System.out.println("Saving " + urlForFile);
+
 				ImageIO.write(img, "png", imgFile);
+
+				String logInfo = new StringBuilder("Saving ")
+					.append(urlForFile)
+					.toString();
+
+				logger.info(logInfo);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
