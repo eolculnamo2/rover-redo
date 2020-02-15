@@ -1,5 +1,6 @@
 package com.rob.rover.service.impl;
 
+import com.rob.rover.constants.DownloadConstants;
 import com.rob.rover.service.DownloadPhotoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +19,11 @@ import java.util.concurrent.CompletableFuture;
 
 @Service
 public class DownloadPhotoServiceImpl implements DownloadPhotoService {
-	private final String SAVE_PATH = "src/main/resources/static/saved-photos/";
 	private static final Logger logger = LoggerFactory.getLogger(DownloadPhotoServiceImpl.class);
 
 	@Override
 	public void downloadPhotos(List<String> photoUrls, String folderName) {
-		File dir = new File(SAVE_PATH + folderName);
+		File dir = new File(DownloadConstants.SAVE_PATH + folderName);
 		if (dir.exists()) {
 			logger.info("Directory already exists");
 			return;
@@ -38,16 +38,16 @@ public class DownloadPhotoServiceImpl implements DownloadPhotoService {
 			try {
 				BufferedImage img = ImageIO.read(new URL(url));
 
-				String urlForFile = new StringBuilder(SAVE_PATH)
+				String urlForFile = new StringBuilder(DownloadConstants.SAVE_PATH)
 					.append(folderName)
 					.append("/")
 					.append(UUID.randomUUID().toString())
-					.append(".png")
+					.append(".jpg")
 					.toString();
 
 				File imgFile = new File(urlForFile);
 
-				ImageIO.write(img, "png", imgFile);
+				ImageIO.write(img, "jpg", imgFile);
 
 				String logInfo = new StringBuilder("Saving ")
 					.append(urlForFile)

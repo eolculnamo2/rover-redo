@@ -13,7 +13,6 @@ public class Helpers {
 			return null;
 		}
 
-
 		for (String format : formats) {
 			try {
 				SimpleDateFormat dateFormatter = new SimpleDateFormat(format);
